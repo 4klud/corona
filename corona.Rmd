@@ -1,0 +1,74 @@
+---
+title: "Corona"
+author: "Claudius Taylor"
+date: "2/28/2020"
+output: pdf_document
+---
+
+```{r results='asis', echo=FALSE, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning=FALSE)
+library(coronavirus)
+library(stats)
+library(dplyr)
+library(lubridate)
+library(data.table)
+library(ggplot2)
+```
+
+```{r}
+data("coronavirus")
+corona <- coronavirus
+head(corona, 15)
+tail(corona, 15)
+```
+
+## number of recovered cases
+
+```{r}
+recovered <- coronavirus %>%
+  filter(type == "recovered") %>%
+  group_by(Province.State) %>%
+  summarise(total = sum(cases)) %>%
+  arrange(-total)
+recovered
+```
+
+## number of confirmed cases
+
+```{r}
+confirmed <- coronavirus %>%
+  filter(type == "confirmed") %>%
+  group_by(Province.State) %>%
+  summarise(total = sum(cases)) %>%
+  arrange(-total)
+confirmed 
+```
+
+## barplots
+
+```{r}
+# including mainland china
+ggplot(coronavirus, aes(Country.Region, cases)) +
+  geom_bar(stat = "identity", position = "identity") +
+  coord_flip()
+
+ggplot(coronavirus) +
+  geom_bar(mapping = aes(x=type, fill = type))
+```
+
+
+```{r}
+# excluding mainland china
+not_mc <- filter(coronavirus, Country.Region  != "Mainland China")
+
+ggplot(not_mc, aes(Country.Region, cases)) +
+  geom_bar(stat = "identity") +
+  coord_flip()
+
+ggplot(not_mc) +
+  geom_bar(mapping = aes(x=type, fill = type))
+```
+
+
+
+
